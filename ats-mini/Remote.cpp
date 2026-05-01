@@ -233,13 +233,16 @@ static bool remoteSetFreq(Stream* stream)
       return remoteShowError(stream, "No such mode");
   }
 
-  // Find first band whose range covers the frequency
+  // Find matching band: first pass skips "ALL" so specific bands take priority
   uint8_t bandMatch = 0xFF;
-  for(int i = 0; i < getTotalBands(); i++) {
-    uint8_t m = (modeIdx != 0xFF) ? modeIdx : bands[i].bandMode;
-    if(m == FM && bands[i].bandMode != FM) continue;
-    if(m != FM && bands[i].bandMode == FM) continue;
-    if(isFreqInBand(&bands[i], freqFromHz(freq, m))) { bandMatch = i; break; }
+  for(int pass = 0; pass < 2 && bandMatch == 0xFF; pass++) {
+    for(int i = 0; i < getTotalBands(); i++) {
+      if(pass == 0 && strcmp(bands[i].bandName, "ALL") == 0) continue;
+      uint8_t m = (modeIdx != 0xFF) ? modeIdx : bands[i].bandMode;
+      if(m == FM && bands[i].bandMode != FM) continue;
+      if(m != FM && bands[i].bandMode == FM) continue;
+      if(isFreqInBand(&bands[i], freqFromHz(freq, m))) { bandMatch = i; break; }
+    }
   }
 
   if(bandMatch == 0xFF)
