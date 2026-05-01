@@ -50,7 +50,7 @@ F{Hz}\n             no mode param, current band only
 F{Hz}[,{mode}]\r    optional mode, auto band-switch across all bands
 ```
 
-Scans all bands for the target frequency and calls `tuneToMemory()`.
+Scans all bands for the target frequency using a two-pass search: the first pass skips the `ALL` band so specific bands take priority; if no specific band matches, a second pass includes `ALL` as a fallback. Calls `tuneToMemory()` with the matched band.
 
 ### `Q` — hardware mute toggle (new)
 
